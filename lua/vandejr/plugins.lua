@@ -192,6 +192,23 @@ ufo.setup()
 local wk = require("which-key")
 local isLow = false
 
+require("codecompanion").setup({
+  strategies = {
+    chat = {
+      adapter = "gemini",
+    },
+    inline = {
+      adapter = "gemini",
+    },
+    cmd = {
+      adapter = "gemini",
+    }
+  },
+  opts = {
+    log_level = "DEBUG"
+  }
+})
+
 wk.add({
 	{ "<leader>gs", vim.cmd.Git, desc = "Git" },
 
@@ -269,6 +286,7 @@ wk.add({
 	{ "<leader>lr", ":Lspsaga rename<CR>", desc = "Rename" },
 	{ "<leader>lF", ":Format<CR>", desc = "Format" },
 
+	{ "<leader>a", ":CodeCompanionActions<CR>", desc = "Apply" },
 	{ "<leader>Ga", ":GeminiApply<CR>", desc = "Apply" },
 	{ "<leader>Gc", ":GeminiChat ", desc = "Chat" },
 	{ mode = { "v" }, "<leader>Ge", ":GeminiCodeExplain<CR>", desc = "Code explain" },
