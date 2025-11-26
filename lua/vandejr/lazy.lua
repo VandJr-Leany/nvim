@@ -48,28 +48,38 @@ require("lazy").setup({
     "williamboman/mason-lspconfig.nvim",
   },
   {
-    "neovim/nvim-lspconfig",
-    lazy = false,
-    dependencies = {
-      { "ms-jpq/coq_nvim",       branch = "coq" },
-      { "ms-jpq/coq.artifacts",  branch = "artifacts" },
-      { "ms-jpq/coq.thirdparty", branch = "3p" },
-    },
-    init = function()
-      vim.g.coq_settings = {
-        auto_start = true,
-      }
-    end,
-    config = function() end,
+    "jay-babu/mason-nvim-dap.nvim",
   },
   {
-    "hrsh7th/cmp-nvim-lsp",
+    "neovim/nvim-lspconfig",
+    lazy = false,
   },
   {
     "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+      "rafamadriz/friendly-snippets",
+      "onsails/lspkind.nvim",
+    },
+    opts = function(_, opts)
+      opts.sources = opts.sources or {}
+      table.insert(opts.sources, {
+        name = "lazydev",
+        group_index = 0,
+      })
+    end,
   },
   {
-    "L3MON4D3/LuaSnip",
+    "mfussenegger/nvim-dap",
+  },
+  {
+    "rcarriga/nvim-dap-ui",
+    dependencies = { "nvim-neotest/nvim-nio" }
   },
   {
     "vim-airline/vim-airline",
@@ -101,21 +111,9 @@ require("lazy").setup({
     },
   },
   {
-    "hrsh7th/nvim-cmp",
-    opts = function(_, opts)
-      opts.sources = opts.sources or {}
-      table.insert(opts.sources, {
-        name = "lazydev",
-        group_index = 0,
-      })
-    end,
-  },
-  {
     "ray-x/lsp_signature.nvim",
     event = "InsertEnter",
-    opts = {
-      -- cfg options
-    },
+    opts = {},
   },
   {
     "nvimdev/lspsaga.nvim",
@@ -137,50 +135,22 @@ require("lazy").setup({
     opts = {},
     cmd = "Trouble",
     keys = {
-      {
-        "<leader>xx",
-        "<cmd>Trouble diagnostics toggle<cr>",
-        desc = "Diagnostics (Trouble)",
-      },
-      {
-        "<leader>xX",
-        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
-      },
-      {
-        "<leader>cs",
-        "<cmd>Trouble symbols toggle focus=false<cr>",
-        desc = "Symbols (Trouble)",
-      },
-      {
-        "<leader>cl",
-        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-        desc = "LSP Definitions / references / ... (Trouble)",
-      },
-      {
-        "<leader>xL",
-        "<cmd>Trouble loclist toggle<cr>",
-        desc = "Location List (Trouble)",
-      },
-      {
-        "<leader>xQ",
-        "<cmd>Trouble qflist toggle<cr>",
-        desc = "Quickfix List (Trouble)",
-      },
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+      { "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
+      { "<leader>cl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", desc = "LSP Definitions (Trouble)" },
+      { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
+      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
     },
   },
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
-    opts = {
-      delay = 0,
-    },
+    opts = { delay = 0 },
     keys = {
       {
         "<leader>?",
-        function()
-          require("which-key").show({ global = false })
-        end,
+        function() require("which-key").show({ global = false }) end,
         desc = "Buffer Local Keymaps (which-key)",
       },
     },
@@ -188,8 +158,6 @@ require("lazy").setup({
   {
     "MeanderingProgrammer/render-markdown.nvim",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
-    ---@module 'render-markdown'
-    ---@type render.md.UserConfig
     opts = {},
   },
   {
@@ -199,12 +167,8 @@ require("lazy").setup({
     "nvim-tree/nvim-tree.lua",
     version = "*",
     lazy = false,
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("nvim-tree").setup({})
-    end,
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function() require("nvim-tree").setup({}) end,
   },
   {
     'nvim-lualine/lualine.nvim',
@@ -212,27 +176,27 @@ require("lazy").setup({
   },
   {
     "stevearc/conform.nvim",
-
     opts = {},
   },
   {
     "kevinhwang91/nvim-ufo",
     dependencies = { "kevinhwang91/promise-async" },
-  }, {
-  "olimorris/codecompanion.nvim",
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-    "nvim-treesitter/nvim-treesitter",
   },
-  opts = {
-    strategies = {
-      chat = {
-        adapter = "gemini",
-      },
+  
+  -- AI / CodeCompanion
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
     },
     opts = {
-      log_level = "DEBUG",
+      strategies = {
+        chat = { adapter = "gemini" },
+      },
+      opts = {
+        log_level = "DEBUG",
+      },
     },
   },
-},
 })
