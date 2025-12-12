@@ -12,48 +12,41 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+
+  -- ==========================================================================
+  -- THEMES
+  -- ==========================================================================
+
+  -- Catppuccin theme
   {
-    "mfussenegger/nvim-lint",
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
   },
+
+  -- Kanagawa theme
   {
-    "nvim-telescope/telescope.nvim",
-    tag = "0.1.8",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    "rebelot/kanagawa.nvim",
   },
+
+  -- Tokyonight theme
   {
     "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
     opts = {},
   },
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    priority = 1000,
-  },
-  {
-    "rebelot/kanagawa.nvim",
-  },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-  },
-  {
-    "tpope/vim-fugitive",
-  },
-  {
-    "williamboman/mason.nvim",
-  },
-  {
-    "williamboman/mason-lspconfig.nvim",
-  },
-  {
-    "jay-babu/mason-nvim-dap.nvim",
-  },
-  {
-    "neovim/nvim-lspconfig",
-    lazy = false,
-  },
+
+  -- ==========================================================================
+  -- LSP & COMPLETION
+  -- ==========================================================================
+
+  -- Mason & Configs
+  { "williamboman/mason.nvim" },
+  { "williamboman/mason-lspconfig.nvim" },
+  { "neovim/nvim-lspconfig",            lazy = false },
+
+  -- Nvim CMP (Completion)
   {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
@@ -74,75 +67,126 @@ require("lazy").setup({
       })
     end,
   },
-  {
-    "mfussenegger/nvim-dap",
-  },
-  {
-    "rcarriga/nvim-dap-ui",
-    dependencies = { "nvim-neotest/nvim-nio" }
-  },
-  {
-    "vim-airline/vim-airline",
-  },
-  {
-    "vim-airline/vim-airline-themes",
-  },
-  {
-    "jiangmiao/auto-pairs",
-  },
-  {
-    "norcalli/nvim-colorizer.lua",
-    event = "BufEnter",
-    opts = { "*" },
-  },
-  {
-    "b0o/schemastore.nvim",
-  },
+
+  -- Lazydev (Lua dev)
   {
     "folke/lazydev.nvim",
     ft = "lua",
     opts = {
       library = {
-        {
-          path = "${3rd}/luv/library",
-          words = { "vim%.uv" },
-        },
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       },
     },
   },
-  {
-    "ray-x/lsp_signature.nvim",
-    event = "InsertEnter",
-    opts = {},
-  },
+
+  -- SchemaStore (JSON/YAML schemas)
+  { "b0o/schemastore.nvim" },
+
+  -- Lspsaga (UI for LSP)
   {
     "nvimdev/lspsaga.nvim",
-    config = function()
-      require("lspsaga").setup({})
-    end,
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-tree/nvim-web-devicons",
-    },
+    config = function() require("lspsaga").setup({}) end,
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
   },
+
+  -- Conform (Formatting)
+  { "stevearc/conform.nvim",       opts = {} },
+
+  -- Nvim-lint (Linting)
+  { "mfussenegger/nvim-lint" },
+
+  -- LSP Signature
+  { "ray-x/lsp_signature.nvim",    event = "InsertEnter", opts = {} },
+
+  -- ==========================================================================
+  -- DEBUGGING & TESTING (Backend Essentials)
+  -- ==========================================================================
+
+  -- DAP (Debugging)
+  { "jay-babu/mason-nvim-dap.nvim" },
+  { "mfussenegger/nvim-dap" },
+  {
+    "rcarriga/nvim-dap-ui",
+    dependencies = { "nvim-neotest/nvim-nio" }
+  },
+
+  -- Neotest (Testing Runner for Jest/Pytest)
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "nvim-lua/plenary.nvim",
+      "antoinemadec/FixCursorHold.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-neotest/neotest-python", -- Adapter for Python
+      "nvim-neotest/neotest-jest",   -- Adapter for Jest (NestJS)
+    }
+  },
+
+  -- ==========================================================================
+  -- DATABASE (Backend Essentials)
+  -- ==========================================================================
+
+  -- Vim-Dadbod (Database Interface)
+  {
+    "kristijanhusak/vim-dadbod-ui",
+    dependencies = {
+      { "tpope/vim-dadbod",                     lazy = true },
+      { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true },
+    },
+    cmd = {
+      "DBUI",
+      "DBUIToggle",
+      "DBUIAddConnection",
+      "DBUIFindBuffer",
+    },
+    init = function()
+      -- Your DBUI configuration
+      vim.g.db_ui_use_nerd_fonts = 1
+    end,
+  },
+
+  -- ==========================================================================
+  -- NAVIGATION & FILES
+  -- ==========================================================================
+
+  -- Telescope
+  {
+    "nvim-telescope/telescope.nvim",
+    tag = "0.1.8",
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
+  -- Harpoon
   {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
     dependencies = { "nvim-lua/plenary.nvim" },
   },
+
+  -- Nvim Tree
   {
-    "folke/trouble.nvim",
-    opts = {},
-    cmd = "Trouble",
-    keys = {
-      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
-      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
-      { "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
-      { "<leader>cl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", desc = "LSP Definitions (Trouble)" },
-      { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
-      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
-    },
+    "nvim-tree/nvim-tree.lua",
+    version = "*",
+    lazy = false,
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function() require("nvim-tree").setup({}) end,
   },
+
+  -- ==========================================================================
+  -- EDITOR UI & UTILITIES
+  -- ==========================================================================
+
+  -- Treesitter
+  { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+
+  -- Colorizer
+  { "norcalli/nvim-colorizer.lua",     event = "BufEnter",                              opts = { "*" } },
+
+  -- Lualine
+  { 'nvim-lualine/lualine.nvim',       dependencies = { 'nvim-tree/nvim-web-devicons' } },
+
+  -- Which-Key
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -151,52 +195,74 @@ require("lazy").setup({
       {
         "<leader>?",
         function() require("which-key").show({ global = false }) end,
-        desc = "Buffer Local Keymaps (which-key)",
+        desc = "Buffer Local Keymaps",
       },
     },
   },
+
+  -- Trouble (Diagnostics list)
+  {
+    "folke/trouble.nvim",
+    opts = {},
+    cmd = "Trouble",
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>",                        desc = "Diagnostics (Trouble)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",           desc = "Buffer Diagnostics (Trouble)" },
+      { "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>",                desc = "Symbols (Trouble)" },
+      { "<leader>cl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", desc = "LSP Definitions (Trouble)" },
+      { "<leader>xL", "<cmd>Trouble loclist toggle<cr>",                            desc = "Location List (Trouble)" },
+      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>",                             desc = "Quickfix List (Trouble)" },
+    },
+  },
+
+  -- Ufo (Folding)
+  { "kevinhwang91/nvim-ufo", dependencies = { "kevinhwang91/promise-async" } },
+
+  -- Auto Pairs
+  { "jiangmiao/auto-pairs" },
+
+  -- Comment
+  { "numToStr/Comment.nvim" },
+
+  -- ==========================================================================
+  -- GIT
+  -- ==========================================================================
+
+  -- Fugitive
+  { "tpope/vim-fugitive" },
+
+  -- Gitsigns (Visual Git indicators in gutter)
+  {
+    "lewis6991/gitsigns.nvim",
+    opts = {
+      current_line_blame = true, -- Show blame on current line
+      current_line_blame_opts = {
+        delay = 500,
+      },
+    }
+  },
+
+  -- ==========================================================================
+  -- AI & MARKDOWN
+  -- ==========================================================================
+
+  -- CodeCompanion
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter" },
+    opts = {
+      strategies = { chat = { adapter = "gemini" } },
+      opts = { log_level = "DEBUG" },
+    },
+  },
+
+  -- Copilot
+  { "github/copilot.vim" },
+
+  -- Render Markdown
   {
     "MeanderingProgrammer/render-markdown.nvim",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     opts = {},
-  },
-  {
-    "numToStr/Comment.nvim",
-  },
-  {
-    "nvim-tree/nvim-tree.lua",
-    version = "*",
-    lazy = false,
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function() require("nvim-tree").setup({}) end,
-  },
-  {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' }
-  },
-  {
-    "stevearc/conform.nvim",
-    opts = {},
-  },
-  {
-    "kevinhwang91/nvim-ufo",
-    dependencies = { "kevinhwang91/promise-async" },
-  },
-  
-  -- AI / CodeCompanion
-  {
-    "olimorris/codecompanion.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-    },
-    opts = {
-      strategies = {
-        chat = { adapter = "gemini" },
-      },
-      opts = {
-        log_level = "DEBUG",
-      },
-    },
   },
 })
