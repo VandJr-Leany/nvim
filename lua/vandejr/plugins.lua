@@ -64,7 +64,7 @@ require("mason-lspconfig").setup({
 local dap = require("dap")
 
 require("mason-nvim-dap").setup({
-  ensure_installed = { "python", "js-debug-adapter" }, -- Nome correto no Mason
+  ensure_installed = { "python", "js-debug-adapter" },
   automatic_installation = true,
   handlers = {
     function(config)
@@ -82,16 +82,13 @@ require("mason-nvim-dap").setup({
 })
 
 -- >>>> CORREÇÃO CRÍTICA PARA JS/TS (PWA-NODE) <<<<
--- Localiza onde o Mason instalou o debugger
 local mason_path = vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter"
 local js_debug_path = mason_path .. "/js-debug/src/dapDebugServer.js"
 
--- Fallback para outros sistemas/versões do pacote
 if not vim.loop.fs_stat(js_debug_path) then
   js_debug_path = mason_path .. "/out/src/dapDebugServer.js"
 end
 
--- Registra o adaptador manualmente apontando para o arquivo encontrado
 dap.adapters["pwa-node"] = {
   type = "server",
   host = "localhost",
@@ -102,7 +99,6 @@ dap.adapters["pwa-node"] = {
   }
 }
 
--- Configura as linguagens para usarem esse adaptador
 for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
   if not dap.configurations[language] then
     dap.configurations[language] = {
@@ -325,6 +321,12 @@ local function open_multi_term()
   vim.cmd("term")
 end
 
+require("lazydocker").setup({
+  border = "double",
+  width = 0.9,
+  height = 0.9,
+})
+
 -- ==========================================
 -- KEYMAPS (WHICH-KEY)
 -- ==========================================
@@ -350,6 +352,9 @@ wk.add({
   { "<leader>Df",        ":DBUIFindBuffer<CR>",                                   desc = "Find DB Buffer" },
   { "<leader>Dr",        ":DBUIRenameBuffer<CR>",                                 desc = "Rename DB Buffer" },
   { "<leader>Dl",        ":DBUILastQueryInfo<CR>",                                desc = "Last Query Info" },
+
+  -- Docker (Lazydocker)
+  { "<leader>ld",        ":Lazydocker<CR>",                                       desc = "LazyDocker" },
 
   -- Git Group
   { "<leader>gs",        vim.cmd.Git,                                             desc = "Git Status" },
