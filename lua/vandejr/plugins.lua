@@ -59,29 +59,30 @@ require("mason-lspconfig").setup({
 })
 
 -- ==========================================
--- DEBUGGING (DAP) SETUP CORRIGIDO
+-- DEBUGGING (DAP) SETUP
 -- ==========================================
 local dap = require("dap")
+
+-- Carrega o launch.json automaticamente se existir na raiz do projeto
+require('dap.ext.vscode').load_launchjs(nil, {
+  ['pwa-node'] = { 'javascript', 'typescript' },
+  ['python'] = { 'python' }
+})
 
 require("mason-nvim-dap").setup({
   ensure_installed = { "python", "js-debug-adapter" },
   automatic_installation = true,
   handlers = {
+    -- Padrão: Deixa o Mason configurar os adaptadores (incluindo Python) automaticamente.
+    -- O Mason usa seu próprio venv interno para o 'debugpy-adapter', o que é mais estável.
     function(config)
-      require('mason-nvim-dap').default_setup(config)
-    end,
-    python = function(config)
-      config.adapters = {
-        type = "executable",
-        command = "/usr/bin/python3",
-        args = { "-m", "debugpy.adapter" },
-      }
       require('mason-nvim-dap').default_setup(config)
     end,
   },
 })
 
--- >>>> CORREÇÃO CRÍTICA PARA JS/TS (PWA-NODE) <<<<
+-- >>>> CONFIGURAÇÃO JS/TS (PWA-NODE) <<<<
+-- Necessário manual pois o pwa-node tem estrutura complexa
 local mason_path = vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter"
 local js_debug_path = mason_path .. "/js-debug/src/dapDebugServer.js"
 
@@ -321,12 +322,6 @@ local function open_multi_term()
   vim.cmd("term")
 end
 
-require("lazydocker").setup({
-  border = "double",
-  width = 0.9,
-  height = 0.9,
-})
-
 -- ==========================================
 -- KEYMAPS (WHICH-KEY)
 -- ==========================================
@@ -354,7 +349,7 @@ wk.add({
   { "<leader>Dl",        ":DBUILastQueryInfo<CR>",                                desc = "Last Query Info" },
 
   -- Docker (Lazydocker)
-  { "<leader>ld",        ":Lazydocker<CR>",                                       desc = "LazyDocker" },
+  { "<leader>ld",        ":LazyDocker<CR>",                                       desc = "LazyDocker" },
 
   -- Git Group
   { "<leader>gs",        vim.cmd.Git,                                             desc = "Git Status" },
