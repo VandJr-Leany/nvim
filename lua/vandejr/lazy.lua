@@ -154,8 +154,8 @@ require("lazy").setup({
     config = function()
       require("lazydocker").setup({
         border = "curved", -- valid options are "single" | "double" | "shadow" | "curved"
-        width = 0.9,    -- width of the floating window (0-1 for percentage, >1 for absolute columns)
-        height = 0.9,   -- height of the floating window (0-1 for percentage, >1 for absolute rows)
+        width = 0.9,       -- width of the floating window (0-1 for percentage, >1 for absolute columns)
+        height = 0.9,      -- height of the floating window (0-1 for percentage, >1 for absolute rows)
       })
     end,
     event = "BufRead",
@@ -242,11 +242,17 @@ require("lazy").setup({
   -- Ufo (Folding)
   { "kevinhwang91/nvim-ufo", dependencies = { "kevinhwang91/promise-async" } },
 
-  -- Auto Pairs
-  { "jiangmiao/auto-pairs" },
-
   -- Comment
   { "numToStr/Comment.nvim" },
+
+  -- autopairs
+  {
+    'windwp/nvim-autopairs',
+    event = "InsertEnter",
+    config = true
+    -- use opts = {} for passing setup options
+    -- this is equivalent to setup({}) function
+  },
 
   -- ==========================================================================
   -- GIT
@@ -273,11 +279,18 @@ require("lazy").setup({
   -- CodeCompanion
   {
     "olimorris/codecompanion.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter" },
-    opts = {
-      strategies = { chat = { adapter = "gemini" } },
-      opts = { log_level = "DEBUG" },
+    version = "^18.0.0",
+    opts = {},
+    dependencies = {
+      "nvim-lua/plenary.nvim",
     },
+  },
+  {
+    "ravitemer/mcphub.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    build = "pnpm install -g mcp-hub@latest"
   },
 
   -- Copilot
@@ -287,6 +300,7 @@ require("lazy").setup({
   {
     "MeanderingProgrammer/render-markdown.nvim",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    ft = { "markdown", "codecompanion" },
     opts = {},
   },
 })

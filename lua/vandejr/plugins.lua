@@ -171,6 +171,9 @@ cmp.setup({
     { name = "render-markdown" },
     { name = "path" },
     { name = "vim-dadbod-completion" },
+    per_filetype = {
+      codecompanion = { "codecompanion" },
+    }
   }, {
     { name = "buffer" },
   }),
@@ -302,11 +305,27 @@ require("which-key").setup()
 
 require("codecompanion").setup({
   strategies = {
-    chat = { adapter = "gemini" },
-    inline = { adapter = "gemini" },
-    cmd = { adapter = "gemini" }
+    chat = { adapter = "gemini_cli" },
+    inline = { adapter = "gemini_cli" },
+    cmd = { adapter = "gemini_cli" }
   },
-  opts = { log_level = "DEBUG" }
+  opts = { log_level = "DEBUG" },
+  extensions = {
+    mcphub = {
+      callback = "mcphub.extensions.codecompanion",
+      opts = {
+        make_tools = true,                    -- Make individual tools (@server__tool) and server groups (@server) from MCP servers
+        show_server_tools_in_chat = true,     -- Show individual tools in chat completion (when make_tools=true)
+        add_mcp_prefix_to_tool_names = false, -- Add mcp__ prefix (e.g `@mcp__github`, `@mcp__neovim__list_issues`)
+        show_result_in_chat = true,           -- Show tool results directly in chat buffer
+        format_tool = nil,                    -- function(tool_name:string, tool: CodeCompanion.Agent.Tool) : string Function to format tool names to show in the chat buffer
+        -- MCP Resources
+        make_vars = true,                     -- Convert MCP resources to #variables for prompts
+        -- MCP Prompts
+        make_slash_commands = true,           -- Add MCP prompts as /slash commands
+      }
+    }
+  }
 })
 
 -- ==========================================
@@ -490,8 +509,43 @@ require('lualine').setup {
     lualine_a = { 'mode' },
     lualine_b = { 'branch', 'diff', 'diagnostics' },
     lualine_c = { 'filename' },
-    lualine_x = { 'encoding', 'fileformat', 'filetype' },
-    lualine_y = { 'progress' },
+    lualine_x = { 'encoding', 'fileformat', 'filetype', 'progress' },
+    lualine_y = { { function()
+      if not vim.g.loaded_mcphub then
+        return "󰐻 -"
+      end
+
+      local count = vim.g.mcphub_servers_count or 0
+      local status = vim.g.mcphub_status or "stopped"
+      local executing = vim.g.mcphub_executing
+
+      if status == "stopped" then
+        return "󰐻 -"
+      end
+
+      if executing or status == "starting" or status == "restarting" then
+        local frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
+        local frame = math.floor(vim.loop.now() / 100) % #frames + 1
+        return "󰐻 " .. frames[frame]
+      end
+
+      return "󰐻 " .. count
+    end,
+      color = function()
+        if not vim.g.loaded_mcphub then
+          return { fg = "#6c7086" }
+        end
+
+        local status = vim.g.mcphub_status or "stopped"
+        if status == "ready" or status == "restarted" then
+          return { fg = "#50fa7b" }
+        elseif status == "starting" or status == "restarting" then
+          return { fg = "#ffb86c" }
+        else
+          return { fg = "#ff5555" }
+        end
+      end,
+    } },
     lualine_z = { 'location' }
   },
   inactive_sections = {
@@ -507,3 +561,6 @@ require('lualine').setup {
   inactive_winbar = {},
   extensions = {}
 }
+
+-- mcphub
+require("mcphub").setup()
